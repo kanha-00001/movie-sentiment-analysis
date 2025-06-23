@@ -50,6 +50,12 @@ function HomePage() {
             🔍 Analyze Sentiment
           </button>
         </form>
+        <button
+          onClick={() => navigate('/recommendations')}
+          className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition-all duration-300 shadow-lg"
+        >
+          🌟 View Recommendations
+        </button>
       </div>
     </div>
   );

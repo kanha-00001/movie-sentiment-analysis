@@ -51,21 +51,21 @@ async function analyzeSentiment(review) {
         headers: {
           'Authorization': `Bearer ${GROQ_API_KEY}`,
           'Content-Type': 'application/json'
-        }
+        },
+        timeout: 10000
       }
     );
 
-    // Parse the JSON content from the response
     const result = JSON.parse(response.data.choices[0].message.content);
     return {
       sentiment: result.sentiment,
       explanation: result.explanation
     };
   } catch (error) {
-    console.error('Error calling Groq API:', error.message);
+    console.error('Groq API Error:', error.response?.data || error.message);
     return {
       sentiment: 'Neutral',
-      explanation: 'Unable to analyze sentiment due to API error.'
+      explanation: 'Unable to analyze sentiment due to API error. Please try again later or check your API key.'
     };
   }
 }
@@ -79,7 +79,6 @@ app.post('/analyze', async (req, res) => {
 
   const { sentiment, explanation } = await analyzeSentiment(review);
 
-  // Store review in database
   db.run(
     `INSERT INTO reviews (review_text, sentiment, explanation) VALUES (?, ?, ?)`,
     [review, sentiment, explanation],
@@ -91,6 +90,32 @@ app.post('/analyze', async (req, res) => {
   );
 
   res.json({ sentiment, explanation });
+});
+
+// New endpoint to fetch recommendations based on review history
+app.get('/recommendations', (req, res) => {
+  db.all(`SELECT review_text, sentiment FROM reviews ORDER BY timestamp DESC`, (err, rows) => {
+    if (err) {
+      console.error('Error fetching reviews:', err.message);
+      return res.status(500).json({ error: 'Failed to fetch recommendations' });
+    }
+
+    if (rows.length === 0) {
+      return res.json({ recommendations: ['No recommendations available yet. Submit a review to get started!'] });
+    }
+
+    // Simple recommendation logic based on sentiment
+    const recommendations = rows.map(row => {
+      if (row.sentiment === 'Positive') {
+        return `Based on your positive review "${row.review_text}", you might enjoy "The Shawshank Redemption" or "Inception".`;
+      } else if (row.sentiment === 'Negative') {
+        return `Based on your negative review "${row.review_text}", you might prefer "The Dark Knight" or "Parasite".`;
+      }
+      return `Based on your neutral review "${row.review_text}", consider "Pulp Fiction" or "The Grand Budapest Hotel".`;
+    });
+
+    res.json({ recommendations });
+  });
 });
 
 // Start server
