@@ -5,7 +5,7 @@ const axios = require('axios');
 require('dotenv').config();
 
 const app = express();
-const port = 5000;
+const port =process.env.PORT || 5000;
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
