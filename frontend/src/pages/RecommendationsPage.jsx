@@ -11,7 +11,7 @@ function RecommendationsPage() {
   useEffect(() => {
     const fetchRecommendations = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/recommendations');
+        const response = await axios.get(`${import.meta.env.VITE_CLIENT_PORT}/recommendations`);
         setRecommendations(response.data.recommendations);
       } catch (err) {
         setError('Failed to fetch recommendations. Please try again.');

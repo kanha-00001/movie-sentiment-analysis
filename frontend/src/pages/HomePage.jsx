@@ -9,7 +9,7 @@ function HomePage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/analyze', { review });
+      const response = await axios.post(`${import.meta.env.VITE_CLIENT_PORT}/analyze`, { review });
       navigate('/results', {
         state: {
           sentiment: response.data.sentiment,
