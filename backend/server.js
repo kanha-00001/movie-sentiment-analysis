@@ -34,7 +34,7 @@ async function analyzeSentiment(review) {
     const response = await axios.post(
       GROQ_API_URL,
       {
-        model: 'llama3-8b-8192',
+        model: 'deepseek-r1-distill-llama-70b',
         messages: [
           {
             role: 'system',
